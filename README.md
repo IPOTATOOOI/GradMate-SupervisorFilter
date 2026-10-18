@@ -1,6 +1,6 @@
 # GradMate
 
-GradMate 是一个面向研究生申请场景的开源工作台，提供学生画像、导师资料抽取与匹配、招生资料问答、申请邮件、简历辅助、保研 DDL 和可选题库练习等功能。项目保留真实的规则算法和外部服务集成；未配置大模型、SMTP、Neo4j 或浏览器时，相关功能会明确提示不可用，不会返回伪造结果。
+GradMate 是一个面向研究生申请场景的开源工作台，提供学生画像、导师资料抽取与匹配、招生资料问答、申请邮件、简历辅助、保研 DDL 和可选题库练习等功能。
 
 ## 技术栈
 
@@ -21,7 +21,7 @@ GradMate/
 │  ├─ storage.py             # SQLite 持久化
 │  ├─ schema.sql             # 空数据库结构初始化脚本
 │  ├─ system_prompt.md       # Agent 系统提示词
-│  ├─ data/                  # 本地运行数据（Git 仅保留占位文件）
+│  ├─ data/                  # 本地运行数据
 │  └─ requirements.txt
 ├─ frontend/
 │  ├─ src/AppShell.vue       # 主工作台页面
@@ -37,7 +37,7 @@ GradMate/
 - Node.js 20.19+（或 22.12+）
 - npm 10+
 
-模型、SMTP、Neo4j 和 Selenium 浏览能力都是可选项。基础的画像管理、导师资料导入、规则匹配和本地 SQLite 存储不要求外部凭据。
+模型、SMTP、Neo4j 和 Selenium 浏览能力都是可选项。
 
 ## 配置
 
@@ -63,7 +63,7 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=
 ```
 
-真实邮件发送需配置 `SMTP_*` 并显式设置 `EMAIL_SEND_ENABLED=true`，题库练习需配置 `PRACTICE_NEO4J_*`。浏览器研究默认使用 Selenium Manager 自动匹配驱动；离线环境可通过 `CHROMEDRIVER_PATH` 指定本地驱动。完整配置项见 [.env.example](.env.example)。
+邮件发送需配置 `SMTP_*` 并显式设置 `EMAIL_SEND_ENABLED=true`，题库练习需配置 `PRACTICE_NEO4J_*`。浏览器研究默认使用 Selenium Manager 自动匹配驱动；离线环境可通过 `CHROMEDRIVER_PATH` 指定本地驱动。完整配置项见 [.env.example](.env.example)。
 
 ## 本地启动
 
@@ -110,23 +110,6 @@ python backend\app.py
 - 前端不能读取或修改 API Key、SMTP 账号和密码；敏感配置只从服务端环境变量读取。
 - SMTP 发送必须由用户在最终预览中明确确认。
 - `GET /api/email/config` 只返回服务是否就绪及非敏感连接状态。
-
-当前项目定位为本地单用户展示版本，未内置账号体系和租户隔离。若要部署到公网，请先增加身份认证、请求限流与网络出口策略，并保持 `EMAIL_SEND_ENABLED=false`，直到完成安全审查。
-
-## 发布前自检
-
-```powershell
-# 前端构建
-npm --prefix frontend run build
-
-# Python 语法检查
-python -m compileall -q backend
-
-# 确认环境文件、数据库和构建产物不会被提交
-git status --ignored
-```
-
-公开发布前仍应使用 GitHub Secret Scanning 或 gitleaks 对完整 Git 历史再扫描一次；仅删除当前文件不能清除既有提交历史中的密钥。
 
 ## License
 
